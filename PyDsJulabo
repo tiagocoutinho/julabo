@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+. alba_blissrc
+cd $SICILIA/ds/python/PyDsXBeeReceiver/src
+
+python PyDsXBeeReceiver.py $*
