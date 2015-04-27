@@ -54,19 +54,19 @@ class PyDsJulaboClass(PyTango.DeviceClass):
                   #'useWorkingTemperatureSP1':[[PyTango.ArgType.DevDouble, 
                   #            PyTango.AttrDataFormat.SCALAR,
                   #            PyTango.AttrWriteType.READ]],
-                  'setPoint1':[[PyTango.ArgType.DevDouble, 
+                  'setPoint1':[[PyTango.ArgType.DevString, 
                               PyTango.AttrDataFormat.SCALAR,
                               PyTango.AttrWriteType.READ_WRITE]],
-                  'pumpPressureStage':[[PyTango.ArgType.DevDouble, 
+                  'pumpPressureStage':[[PyTango.ArgType.DevString, 
                               PyTango.AttrDataFormat.SCALAR,
                               PyTango.AttrWriteType.READ_WRITE]],
-                  'bathTemp':[[PyTango.ArgType.DevDouble, 
+                  'bathTemp':[[PyTango.ArgType.DevString, 
                               PyTango.AttrDataFormat.SCALAR,
                               PyTango.AttrWriteType.READ]],
-                  'heatingPower':[[PyTango.ArgType.DevDouble, 
+                  'heatingPower':[[PyTango.ArgType.DevString, 
                               PyTango.AttrDataFormat.SCALAR,
                               PyTango.AttrWriteType.READ]],
-                  'extSensorTemp':[[PyTango.ArgType.DevDouble, 
+                  'extSensorTemp':[[PyTango.ArgType.DevString, 
                               PyTango.AttrDataFormat.SCALAR,
                               PyTango.AttrWriteType.READ]],
 
@@ -88,7 +88,7 @@ class PyDsJulabo(PyTango.Device_4Impl):
     def init_device(self):
         self.info_stream('In Python init_device method')
         self.get_device_properties(self.get_device_class())
-        self.julabo_device = PyDsJulabo(port=self.port, baudrate=self.baudrate)
+        self.julabo_device = Julabo(port=self.port, baudrate=self.baudrate)
 
     #------------------------------------------------------------------
 
@@ -110,10 +110,9 @@ class PyDsJulabo(PyTango.Device_4Impl):
         the_att.set_value(sp)
 
     @PyTango.DebugIt()
-    def write_setPoint1(self, val):
-        self.info_stream("write_setPoint1")     
-        self.julabo_device.SetPoint1=val
-        self.setPoint1 = val
+    def write_setPoint1(self, the_att):
+        self.info_stream("write_setPoint1")  
+	self.julabo_device.SetPoint1 = the_att.get_write_value()
         
     @PyTango.DebugIt()
     def read_pumpPressureStage(self, the_att):
@@ -122,27 +121,27 @@ class PyDsJulabo(PyTango.Device_4Impl):
         the_att.set_value(sp)
         
     @PyTango.DebugIt()
-    def write_pumpPressureStage(self, val):
+    def write_pumpPressureStage(self, the_att):
         self.info_stream("write_pumpPressureStage")     
-        self.julabo_device.PumpPressureStage = val
+        self.julabo_device.PumpPressureStage = the_att.get_write_value()
         self.setPoint1 = val  
  
     @PyTango.DebugIt()      
     def read_bathTemp(self, the_att):
         self.info_stream("read_bathTemp")
-        sp = self.julabo_device.getBathTemp()
+        sp = self.julabo_device.BathTemp
         the_att.set_value(sp)
 
     @PyTango.DebugIt()        
     def read_heatingPower(self, the_att):
         self.info_stream("read_heatingPower")
-        sp = self.julabo_device.getHeatingPower()
+        sp = self.julabo_device.HeatingPower
         the_att.set_value(sp)
     
     @PyTango.DebugIt()        
     def read_extSensorTemp(self, the_att):
         self.info_stream("read_extSensorTemp")
-        sp = self.julabo_device.getExtSensorTemp()
+        sp = self.julabo_device.ExtSensorTemp
         the_att.set_value(sp)
         
     @PyTango.DebugIt()
