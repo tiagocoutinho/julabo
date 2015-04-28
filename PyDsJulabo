@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 . alba_blissrc
-cd $SICILIA/ds/python/PyDsXBeeReceiver/src
+cd $SICILIA/ds/python/PyDsJulabo/src
 
-python PyDsXBeeReceiver.py $*
+python PyDsJulabo $*
