@@ -40,6 +40,7 @@ class PyDsJulaboClass(PyTango.DeviceClass):
 
     #   Device Properties
     device_property_list = {
+        'model':[PyTango.DevString, 'Julabos Model', 'CF41' ],  
         'port':[PyTango.DevString, 'Serial port name', '/dev/ttyS0' ],  
         'baudrate': [PyTango.DevLong, 'Serial port bautrate', 9600 ],
         }
@@ -51,30 +52,17 @@ class PyDsJulaboClass(PyTango.DeviceClass):
     cmd_list = {}
    
     attr_list = {
-                  #'useWorkingTemperatureSP1':[[PyTango.ArgType.DevDouble, 
-                  #            PyTango.AttrDataFormat.SCALAR,
-                  #            PyTango.AttrWriteType.READ]],
-                  'setPoint1':[[PyTango.ArgType.DevString, 
-                              PyTango.AttrDataFormat.SCALAR,
-                              PyTango.AttrWriteType.READ_WRITE]],
-                  'pumpPressureStage':[[PyTango.ArgType.DevString, 
-                              PyTango.AttrDataFormat.SCALAR,
-                              PyTango.AttrWriteType.READ_WRITE]],
-                  'bathTemp':[[PyTango.ArgType.DevString, 
-                              PyTango.AttrDataFormat.SCALAR,
-                              PyTango.AttrWriteType.READ]],
-                  'heatingPower':[[PyTango.ArgType.DevString, 
-                              PyTango.AttrDataFormat.SCALAR,
-                              PyTango.AttrWriteType.READ]],
-                  'extSensorTemp':[[PyTango.ArgType.DevString, 
-                              PyTango.AttrDataFormat.SCALAR,
-                              PyTango.AttrWriteType.READ]],
 
+                  'JulaboStatus':[[PyTango.ArgType.DevString, 
+                              PyTango.AttrDataFormat.SCALAR,
+                              PyTango.AttrWriteType.READ]],
                  }
     
     def __init__(self, name):
         PyTango.DeviceClass.__init__(self, name)
         self.set_type("PyDsJulabo")
+     
+     
         
 class PyDsJulabo(PyTango.Device_4Impl):
 
@@ -88,9 +76,35 @@ class PyDsJulabo(PyTango.Device_4Impl):
     def init_device(self):
         self.info_stream('In Python init_device method')
         self.get_device_properties(self.get_device_class())
-        self.julabo_device = Julabo(port=self.port, baudrate=self.baudrate)
+        self.model = self.model.lower()
+        self.julabo_device = Julabo(port=self.port, baudrate=self.baudrate, 
+                                    model=self.model)
+
+        self.attr_to_use = self.julabo_device.getDevAttributes()
+        self.dyn_attr()
+
+    def dyn_attr(self):
+        
+        for attr in self.attr_to_use:
+            attrname = attr
+            attr = self.attr_to_use[attr]
+            typename,dyntype = 'DevString',PyTango.DevString
+            
+            AttrType = PyTango.AttrWriteType.READ
+            writable = attr.has_key('write')
+            write_method = None
+
+            if writable:
+                write_method= self.write_dyn_attr
+                AttrType = PyTango.AttrWriteType.READ_WRITE
+                
+            attrib = PyTango.Attr(attrname,PyTango.DevDouble, AttrType)          
+            self.add_attribute(attrib,self.read_dyn_attr,write_method,
+                               is_allo_meth=None)
+
 
     #------------------------------------------------------------------
+
 
     @PyTango.DebugIt()
     def delete_device(self):
@@ -98,50 +112,30 @@ class PyDsJulabo(PyTango.Device_4Impl):
         self.julabo_device._close()
         
         
-        
+    def read_dyn_attr(self,attr):
+        attrname = attr.get_name()
+        self.info_stream('In read_dyn_attr(%s)'%attrname)
+        cmd = self.attr_to_use[attrname]['read']
+        response = self.julabo_device._sendCmdWaitResponse(cmd)
+        attr.set_value(response)
+    
+    def write_dyn_attr(self, attr):
+        attrname = attr.get_name()
+        val = str(attr.get_write_value())
+        self.info_stream('In write_dyn_attr(%s) with value(%s)'%(attrname, val))
+        cmd = self.attr_to_use[attrname]['write']
+        cmd = cmd + ' ' + str(val)
+        self.julabo_device._sendCmd(cmd)
+
+    
     #------------------------------------------------------------------
     # ATTRIBUTES
     #------------------------------------------------------------------
 
     @PyTango.DebugIt()
-    def read_setPoint1(self, the_att):
-        self.info_stream("read_setPoint1")
-        sp = self.julabo_device.SetPoint1
-        the_att.set_value(sp)
-
-    @PyTango.DebugIt()
-    def write_setPoint1(self, the_att):
-        self.info_stream("write_setPoint1")  
-	self.julabo_device.SetPoint1 = the_att.get_write_value()
-        
-    @PyTango.DebugIt()
-    def read_pumpPressureStage(self, the_att):
-        self.info_stream("read_pumpPressureStage")
-        sp = self.julabo_device.PumpPressureStage
-        the_att.set_value(sp)
-        
-    @PyTango.DebugIt()
-    def write_pumpPressureStage(self, the_att):
-        self.info_stream("write_pumpPressureStage")     
-        self.julabo_device.PumpPressureStage = the_att.get_write_value()
-        self.setPoint1 = val  
- 
-    @PyTango.DebugIt()      
-    def read_bathTemp(self, the_att):
-        self.info_stream("read_bathTemp")
-        sp = self.julabo_device.BathTemp
-        the_att.set_value(sp)
-
-    @PyTango.DebugIt()        
-    def read_heatingPower(self, the_att):
-        self.info_stream("read_heatingPower")
-        sp = self.julabo_device.HeatingPower
-        the_att.set_value(sp)
-    
-    @PyTango.DebugIt()        
-    def read_extSensorTemp(self, the_att):
-        self.info_stream("read_extSensorTemp")
-        sp = self.julabo_device.ExtSensorTemp
+    def read_JulaboStatus(self, the_att):
+        self.info_stream("read_JulaboStatus")
+        sp = self.julabo_device.JulaboStatus
         the_att.set_value(sp)
         
     @PyTango.DebugIt()

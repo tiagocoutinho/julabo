@@ -3,29 +3,47 @@ import logging
 import re
 
 
-CMDS = {'setPoint1': {'read': 'in_sp_00', 'write': 'out_sp_00'},
+CMDS_CF = {
+        'setPoint1': {'read': 'in_sp_00', 'write': 'out_sp_00'},
         'pumpPressureStage': {'read': 'in_sp_07', 'write':'out_sp_07'},
         'bathTemp': {'read': 'in_pv_00'},
         'heatingPower':{'read': 'in_pv_01'},
         'extSensorTemp': {'read': 'in_pv_02'},
-        'julaboStatus': {'read': 'version'}}
+        }
 
+CMDS_FC = {
+        'workingTemperature': {'read': 'in_sp_00', 'write': 'out_sp_00'},
+        'pumpPressureStage': {'read': 'in_sp_07', 'write':'out_sp_07'},
+        'bathTemp': {'read': 'in_pv_00'},
+        'returnTemperature':{'read': 'in_pv_03'},
+        'extSensorTemp': {'read': 'in_pv_01'},
+        }
 
+CMDS_SHARED = {
+               'julaboStatus': {'read': 'version'}
+               }
 class Julabo(object):
     """
+    
     """
     def __init__(self, port='/dev/ttyR14', baudrate=9600,   # baud rate
                  bytesize=serial.SEVENBITS,    # number of data bits
                  parity=serial.PARITY_EVEN,    # enable parity checking
                  stopbits=serial.STOPBITS_ONE, # number of stop bits
                  timeout=3,          # set a timeout value, None to wait forever
-                 xonxoff=True,  ):
+                 xonxoff=True, model='cf31'):
        
         self._comm = serial.Serial(port, baudrate=baudrate, bytesize=bytesize,
                                  parity=parity, stopbits=stopbits, 
                                  timeout=timeout, xonxoff=xonxoff)
         logging.debug('Created Julabo object') 
-        self._open()
+        #self._open()
+        if model.startswith('cf'):
+            self.commands = CMDS_CF
+        elif model.startswith('fc'):
+            self.command = CMDS_FC
+        else:
+            self.commands = None
     
     def _read(self):
         try:
@@ -37,8 +55,7 @@ class Julabo(object):
             result = None
         return result
 
-    def _write(self, data):
-        
+    def _write(self, data): 
         try:
             logging.debug('Writing command')
             data = data + '\r'
@@ -75,50 +92,21 @@ class Julabo(object):
         
         self._close()
         
+    def getDevAttributes(self):
+        return self.commands
+    
+    
     @property
-    def SetPoint1(self):
-        cmd = CMDS['setPoint1']['read']
-        return self._sendCmdWaitResponse(cmd)
- 
-    @SetPoint1.setter
-    def SetPoint1(self, val):
-        cmd = CMDS['setPoint1']['write']
-        cmd = cmd + ' '+ val
-        self._sendCmd(cmd)
-    
-    @property    
-    def PumpPressureStage(self):
-        cmd = CMDS['pumpPressureStage']['read']
-        return self._sendCmdWaitResponse(cmd)        
-    
-    @PumpPressureStage.setter
-    def PumpPressureStage(self,val):
-        cmd = CMDS['pumpPressureStage']['write']
-        cmd = cmd + ' '+val
-        self._sendCmd(cmd)
-
-    @property    
-    def BathTemp(self):
-        cmd = CMDS['bathTemp']['read']
-        return self._sendCmdWaitResponse(cmd)
-
-    @property    
-    def HeatingPower(self):
-        cmd = CMDS['heatingPower']['read']
+    def JulaboStatus(self):
+        cmd = 'status'
         return self._sendCmdWaitResponse(cmd)
     
-    @property        
-    def ExtSensorTemp(self):
-        cmd = CMDS['extSensorTemp']['read']
-        return self._sendCmdWaitResponse(cmd)
-
     def _getValueFromResponse(self,data):
         data = data.strip('\r')
         data = data.strip('\n')
         logging.debug('Cleaned response:  %s ', data)   
         return data    
-        
-            
+                  
 if __name__ == '__main__':
     format ='%(asctime)s %(levelname)s:%(message)s'
     level = logging.DEBUG
