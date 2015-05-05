@@ -98,7 +98,7 @@ class PyDsJulabo(PyTango.Device_4Impl):
                 write_method= self.write_dyn_attr
                 AttrType = PyTango.AttrWriteType.READ_WRITE
                 
-            attrib = PyTango.Attr(attrname,PyTango.DevDouble, AttrType)          
+            attrib = PyTango.Attr(attrname,PyTango.DevString, AttrType)          
             self.add_attribute(attrib,self.read_dyn_attr,write_method,
                                is_allo_meth=None)
 
