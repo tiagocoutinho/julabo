@@ -29,9 +29,6 @@ from JulaboLib import Julabo
 
 
 
-
-
-
 class PyDsJulaboClass(PyTango.DeviceClass):
 
     class_property_list = {
@@ -39,9 +36,9 @@ class PyDsJulaboClass(PyTango.DeviceClass):
 
     #   Device Properties
     device_property_list = {
-        'model':[PyTango.DevString, 'Julabos Model', 'CF41' ],  
-        'port':[PyTango.DevString, 'Serial port name', '/dev/ttyS0' ],  
-        'baudrate': [PyTango.DevLong, 'Serial port bautrate', 9600 ],
+        'model': [PyTango.DevString, 'Julabos Model', 'CF41'],
+        'port': [PyTango.DevString, 'Serial port name', '/dev/ttyS0'],
+        'baudrate': [PyTango.DevLong, 'Serial port bautrate', 9600],
         }
 
     cmd_list = {'Start': [[PyTango.ArgType.DevVoid, ""],
@@ -139,11 +136,11 @@ class PyDsJulabo(PyTango.Device_4Impl):
 
     def Start(self):
         self.info_stream('In Start Command(%s)')
-        self.julabo_device.Start()
+        self.julabo_device.start()
 
     def Stop(self):
         self.info_stream('In Stop Command(%s)')
-        self.julabo_device.Stop()
+        self.julabo_device.stop()
 
     #------------------------------------------------------------------
     # ATTRIBUTES

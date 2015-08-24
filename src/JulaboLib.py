@@ -113,11 +113,11 @@ class Julabo(object):
         cmd = 'status'
         return self._sendCmdWaitResponse(cmd)
 
-    def Start(self):
+    def start(self):
         cmd = self.commands['commands']['Start']
         self._sendCmd(cmd)
 
-    def Stop(self):
+    def stop(self):
         cmd = self.commands['commands']['Stop']
         self._sendCmd(cmd)
 
