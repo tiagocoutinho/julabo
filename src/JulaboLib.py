@@ -53,7 +53,7 @@ class Julabo(object):
         if model.startswith('cf'):
             self.commands = CMDS_CF
         elif model.startswith('fc'):
-            self.command = CMDS_FC
+            self.commands = CMDS_FC
         else:
             self.commands = None
     
@@ -136,5 +136,3 @@ if __name__ == '__main__':
     a = Julabo()
     r = a._sendCmdWaitResponse(cmd_test)
     a._getValueFromResponse(r)
-
-    
