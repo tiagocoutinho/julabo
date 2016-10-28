@@ -76,7 +76,7 @@ class PyDsJulabo(PyTango.Device_4Impl):
         self.model = self.model.lower()
         self.julabo_device = Julabo(port=self.port, baudrate=self.baudrate, 
                                     model=self.model)
-
+        self.set_state(PyTango.DevState.STANDBY)
         self.configuration = self.julabo_device.getDevConfiguration()
         self.dyn_attr()
 
@@ -137,10 +137,12 @@ class PyDsJulabo(PyTango.Device_4Impl):
     def Start(self):
         self.info_stream('In Start Command(%s)')
         self.julabo_device.start()
+        self.set_state(PyTango.DevState.RUNNING)
 
     def Stop(self):
         self.info_stream('In Stop Command(%s)')
         self.julabo_device.stop()
+        self.set_state(PyTango.DevState.OFF)
 
     #------------------------------------------------------------------
     # ATTRIBUTES
