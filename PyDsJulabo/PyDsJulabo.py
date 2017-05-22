@@ -159,10 +159,14 @@ class PyDsJulabo(PyTango.Device_4Impl):
         return self.get_state() in (PyTango.DevState.ON,)
         
 
-if __name__ == '__main__':
+
+def main():    
     util = PyTango.Util(sys.argv)
     util.add_class(PyDsJulaboClass, PyDsJulabo)
 
     U = PyTango.Util.instance()
     U.server_init()
     U.server_run()
+    
+if __name__ == '__main__':
+    main()
