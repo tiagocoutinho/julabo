@@ -1,26 +1,51 @@
+# -*- coding: utf-8 -*-
+
+"""The setup script."""
+
+import sys
 from setuptools import setup, find_packages
-import os
 
-def main():
+requirements = ["pyserial"]
 
-    setup(
-        name='PyDsJulabo',
-        packages= find_packages(),
-        version = '1.2.1',    
-        long_description='The device server is intended to contro the Julabo Cryo-Compact Circulator.\n It can manage Cf and FC series',
-        url='http://www.cells.es',
-        author='CTBeamlines',
-        author_email='ctbeamlines@cells.es',
-        description='This package contains Julabo DS',
-        platforms = "all",        
-        include_package_data = True,
-    
-    # Define automatic scripts tht will be created during installation.
+with open("README.md") as f:
+    description = f.read()
+
+setup(
+    name="julabo",
+    author="Tiago Coutinho",
+    author_email="tcoutinho@cells.es",
+    version="1.2.1",
+    description="julabo library",
+    long_description=description,
+    long_description_content_type="text/markdown",
     entry_points={
-        'console_scripts': [
-                            'PyDsJulabo = PyDsJulabo.PyDsJulabo:main',
-                        ],
-        }
-    )
-if __name__ == "__main__":
-    main()
+        "console_scripts": [
+            "Julabo = julabo.tango.server:main [tango]",
+        ]
+    },
+    install_requires=requirements,
+    extras_require={
+        "tango": ["pytango"],
+        "simulator": ["sinstruments>=1"]
+    },
+    classifiers=[
+        "Natural Language :: English",
+        "Intended Audience :: Developers",
+        "Development Status :: 2 - Pre-Alpha",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)'
+    ],
+    license="LGPLv3",
+    include_package_data=True,
+    keywords="julabo, library, tango",
+    packages=find_packages(),
+    url="https://github.com/tiagocoutinho/julabo",
+    project_urls={
+        "Documentation": "https://github.com/tiagocoutinho/julabo",
+        "Source": "https://github.com/tiagocoutinho/julabo"
+    }
+)

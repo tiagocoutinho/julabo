@@ -1,7 +1,0 @@
-#!/bin/sh
-
-. alba_blissrc
-
-cd $SICILIA/ds/python/PyDsJulabo
-CMD="python PyDsJulabo.py $1 $2 $3"
-$CMD &

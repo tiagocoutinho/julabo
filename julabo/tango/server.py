@@ -25,7 +25,7 @@
 
 import PyTango
 import sys
-from JulaboLib import Julabo
+from julabo import Julabo
 
 
 
