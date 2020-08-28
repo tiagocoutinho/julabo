@@ -60,10 +60,10 @@ class Julabo(object):
     def _read(self):
         try:
             logging.debug('Reading response')
-            result = self._comm.readline()
+            result = self._comm.readline().decode()
             #logging.debug('Read %s Value', repr(result))
             result = self._getValueFromResponse(result)
-        except Exception, e:
+        except Exception:
             result = None
         return result
 
@@ -71,8 +71,8 @@ class Julabo(object):
         try:
             logging.debug('Writing command')
             data = data + '\r'
-            self._comm.write(data)
-        except Exception, e:
+            self._comm.write(data.encode())
+        except Exception:
             return False
         return True
 
