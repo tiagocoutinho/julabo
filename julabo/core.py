@@ -17,10 +17,8 @@ QUERY_LATENCY = 0.01
 def serial_for_url(
     url, *args,
     baudrate=9600,
-    bytesize=8,
-    parity='N',
-#    bytesize=serial.SEVENBITS,
-#    parity=serial.PARITY_EVEN,
+    bytesize=serial.SEVENBITS,
+    parity=serial.PARITY_EVEN,
     stopbits=serial.STOPBITS_ONE,
     timeout=1,
     xonxoff=True

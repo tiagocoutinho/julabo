@@ -8,12 +8,15 @@ class BaseJulabo(Device):
 
     url = device_property(dtype=str)
     baudrate = device_property(dtype=int, default_value=9600)
+    bytesize = device_property(dtype=int, default_value=8)
+    parity = device_property(dtype=str, default_value='N')
 
     Julabo = None
 
     def init_device(self):
         super().init_device()
-        conn = serial_for_url(self.url, baudrate=self.baudrate)
+        conn = serial_for_url(self.url, baudrate=self.baudrate,
+                              bytesize=self.bytesize, parity=self.parity)
         self.julabo = self.Julabo(conn)
 
     def dev_state(self):
