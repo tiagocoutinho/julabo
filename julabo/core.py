@@ -139,6 +139,12 @@ class TemperatureControl(IntEnum):
 make_encoder(TemperatureControl)
 
 
+class ControlMode(IntEnum):
+    Remote = 0
+    Local = 1
+make_encoder(ControlMode)
+
+
 class BaseJulabo:
 
     def __init__(self, connection):
@@ -186,8 +192,8 @@ class JulaboCF(BaseJulabo):
     set_point_1 = Float2("IN_SP_00", "OUT_SP_00")
     set_point_2 = Float2("IN_SP_01", "OUT_SP_01")
     set_point_3 = Float2("IN_SP_02", "OUT_SP_02")
-    high_temperature_warning = Float2("IN_SP_02", "OUT_SP_02")
-    low_temperature_warning = Float2("IN_SP_03", "OUT_SP_03")
+    high_temperature = Float2("IN_SP_02", "OUT_SP_02")
+    low_temperature = Float2("IN_SP_03", "OUT_SP_03")
     active_set_point_channel = member(
         "IN_MODE_01", "OUT_MODE_01",
         decode=lambda v: int(v) + 1,
@@ -201,12 +207,12 @@ class JulaboCF(BaseJulabo):
 class JulaboFC(BaseJulabo):
 
     working_temperature = Float1("IN_SP_00", "OUT_SP_00")
-    high_temperature = Int("IN_SP_01", "OUT_SP_01")
-    low_temperature = Int("IN_SP_02", "OUT_SP_02")
+    high_temperature = Int("IN_SP_01")
+    low_temperature = Int("IN_SP_02")
     control_ratio = Int("IN_SP_03", "OUT_SP_03")
     feed_temperature = Float2("IN_PV_00")
-    external_sensor_temperature = Float2("IN_PV_01")
+    external_emperature = Float2("IN_PV_01")
     heater_capacity = Float2("IN_PV_02")
     return_temperature = Float2("IN_PV_03")
     safety_temperature = Float2("IN_PV_04")
-
+    control_mode = Enum("IN_MODE_04", "OUT_MODE_04", ControlMode)
