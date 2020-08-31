@@ -1,98 +1,44 @@
 import enum
 import time
+import asyncio
 import logging
 import functools
-import threading
-
-import serial
 
 
-# TODO: set latency (see pag.72 of CF31 manual "Important times for a command transmission")
-# 250ms after command
-# 10ms after query
-COMMAND_LATENCY = 0.250
-QUERY_LATENCY = 0.01
+async def _call(func, coro):
+    return func(await coro)
 
 
-def serial_for_url(
-    url, *args,
-    baudrate=9600,
-    bytesize=serial.SEVENBITS,
-    parity=serial.PARITY_EVEN,
-    stopbits=serial.STOPBITS_ONE,
-    timeout=1,
-    xonxoff=True
-):
-    conn = serial.serial_for_url(
-        url, *args, baudrate=baudrate, bytesize=bytesize,
-        parity=parity, stopbits=stopbits,
-        xonxoff=xonxoff, timeout=timeout)
-    lock = threading.Lock()
-    last_query = 0
-    last_command = 0
-
-    def back_pressure():
-        nonlocal last_query, last_command
-        now = time.monotonic()
-        future = max(last_query + QUERY_LATENCY, last_command + COMMAND_LATENCY)
-        wait = future - now
-        if wait > 0:
-            time.sleep(wait)
-
-    def consume():
-        data = []
-        while(conn.in_waiting):
-            data.append(conn.read(conn.in_waiting))
-        return b''.join(data)
-
-    def send(data):
-        back_pressure()
-        try:
-            conn.write(data)
-        finally:
-            nonlocal last_command
-            last_command = time.monotonic()
-
-    def write_readline(data):
-        back_pressure()
-        try:
-            with lock:
-                garbage = conn.consume()
-                if garbage:
-                    logging.warning('disposed of %r', garbage)
-                conn.write(data)
-                return conn.readline()
-        finally:
-            nonlocal last_query
-            last_query = time.monotonic()
-    conn.consume = consume
-    conn.send = send
-    conn.write_readline = write_readline
-    return conn
+def _sync_call(func, arg):
+    if asyncio.iscoroutine(arg):
+        return _call(func, arg)
+    else:
+        return func(arg)
 
 
 def member(read=None, write=None, decode=lambda x: x, encode=lambda x: x):
+
     if read:
         if write:
             def member(self, value=None):
                 if value is None:
-                    return decode(self._ask(read))
+                    return _sync_call(decode, self.write_readline(read))
                 else:
-                    self._send("{} {}".format(write, encode(value)))
+                    return self.write("{} {}".format(write, encode(value)))
         else:
             def member(self):
-                return decode(self._ask(read))
+                return _sync_call(decode, self.write_readline(read))
     else:
         def member(self, value=None):
             if value is None:
-                self._send(write)
+                return self.write(write)
             else:
-                self._send("{} {}".format(write, encode(value)))
+                return self.write("{} {}".format(write, encode(value)))
     return member
 
 
-Float1 = functools.partial(member, decode=float, encode=lambda x: '{.1f}'.format(x))
-Float2 = functools.partial(member, decode=float, encode=lambda x: '{.2f}'.format(x))
+Float1 = functools.partial(member, decode=float, encode=lambda x: '{:.1f}'.format(float(x)))
+Float2 = functools.partial(member, decode=float, encode=lambda x: '{:.2f}'.format(float(x)))
 Int = functools.partial(member, decode=int, encode=lambda x: str(int(x)))
 
 
@@ -147,29 +93,19 @@ make_encoder(ControlMode)
 
 class BaseJulabo:
 
-    def __init__(self, connection):
-        """
-        Args:
-            connection (object): any object with write_readline method.
-                Typical are sockio.TCP or serialio.aio.tcp.Serial
-        """
+    @classmethod
+    def from_connection(cls, connection):
+        return cls(Protocol(connection))
+
+    def __init__(self, protocol):
         self._log = logging.getLogger("julabo.{}".format(type(self).__name__))
-        self._conn = connection
+        self.protocol = protocol
 
-    def close(self):
-        self._conn.close()
+    def write(self, request):
+        return self.protocol.write(request)
 
-    def _ask(self, request):
-        request = (request + "\r").encode()
-        self._log.debug("request: %r", request)
-        reply = self._conn.write_readline(request)
-        self._log.debug("reply: %r", reply)
-        return reply.decode().strip()
-
-    def _send(self, request):
-        request = (request + "\r").encode()
-        self._log.debug("command: %r", request)
-        self._conn.send(request)
+    def write_readline(self, request):
+        return self.protocol.write_readline(request)
 
     version = member("VERSION")
     status = member("STATUS")
@@ -177,10 +113,10 @@ class BaseJulabo:
     is_started = member("IN_MODE_05", decode=lambda x: x == "1")
 
     def start(self):
-        self._send("OUT_MODE_05 1")
+        return self.write("OUT_MODE_05 1")
 
     def stop(self):
-        self._send("OUT_MODE_05 0")
+        return self.write("OUT_MODE_05 0")
 
 
 class JulaboCF(BaseJulabo):

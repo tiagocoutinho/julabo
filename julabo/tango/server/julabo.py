@@ -1,7 +1,7 @@
 from tango import DevState
 from tango.server import Device, attribute, command, device_property
 
-from julabo import JulaboCF as _JulaboCF, JulaboFC as _JulaboFC, serial_for_url
+from julabo import JulaboCF as _JulaboCF, JulaboFC as _JulaboFC, protocol_for_url
 
 
 class BaseJulabo(Device):
@@ -15,9 +15,16 @@ class BaseJulabo(Device):
 
     def init_device(self):
         super().init_device()
-        conn = serial_for_url(self.url, baudrate=self.baudrate,
-                              bytesize=self.bytesize, parity=self.parity)
-        self.julabo = self.Julabo(conn)
+        kwargs = {}
+        if self.url.startswith("serial") or self.url.startswith("rfc2217"):
+            kwargs = dict(baudrate=self.baudrate, bytesize=self.bytesize,
+                          parity=self.parity)
+        else:
+            kwargs = {}
+        if self.url.startswith("serial"):
+            kwargs["concurrency"] = "syncio"
+        protocol = protocol_for_url(self.url, **kwargs)
+        self.julabo = self.Julabo(protocol)
 
     def dev_state(self):
         status_code = int(self.julabo.status()[:2])
