@@ -4,6 +4,9 @@ import asyncio
 import logging
 import functools
 
+from .protocol import Protocol
+
+
 __all__ = [
     "JulaboCF", "JulaboHL", "JulaboFC",
     "SelfTunning", "ExternalInput", "TemperatureControl", "ControlMode"
@@ -98,13 +101,9 @@ make_encoder(ControlMode)
 
 class BaseJulabo:
 
-    @classmethod
-    def from_connection(cls, connection):
-        return cls(Protocol(connection))
-
-    def __init__(self, protocol):
+    def __init__(self, connection):
         self._log = logging.getLogger("julabo.{}".format(type(self).__name__))
-        self.protocol = protocol
+        self.protocol = Protocol(connection)
 
     def write(self, request):
         return self.protocol.write(request)

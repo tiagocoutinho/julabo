@@ -5,7 +5,7 @@ from julabo import (
     JulaboCF as _JulaboCF,
     JulaboHL as _JulaboHL,
     JulaboFC as _JulaboFC,
-    protocol_for_url
+    connection_for_url
 )
 
 
@@ -25,8 +25,8 @@ class BaseJulabo(Device):
             kwargs = dict(baudrate=self.baudrate, bytesize=self.bytesize,
                           parity=self.parity)
 
-        protocol = protocol_for_url(self.url, **kwargs)
-        self.julabo = self.Julabo(protocol)
+        connection = connection_for_url(self.url, **kwargs)
+        self.julabo = self.Julabo(connection)
 
     async def dev_state(self):
         status_code = int((await self.julabo.status())[:2])
