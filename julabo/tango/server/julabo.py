@@ -5,8 +5,7 @@ from julabo import (
     JulaboCF as _JulaboCF,
     JulaboHL as _JulaboHL,
     JulaboFC as _JulaboFC,
-    protocol_for_url,
-    SelfTunning, ExternalInput, TemperatureControl, ControlMode
+    protocol_for_url
 )
 
 
@@ -125,25 +124,25 @@ class BaseJulaboCirculator(BaseJulabo):
     async def active_set_point_channel(self, value):
         await self.julabo.active_set_point_channel(value)
 
-    @attribute(dtype=SelfTunning)
+    @attribute(dtype=str)
     async def self_tunning(self):
-        return await self.julabo.self_tunning()
+        return (await self.julabo.self_tunning()).name
 
     @self_tunning.setter
     async def self_tunning(self, value):
         await self.julabo.self_tunning(value)
 
-    @attribute(dtype=ExternalInput)
+    @attribute(dtype=str)
     async def external_input(self):
-        return await self.julabo.external_input()
+        return (await self.julabo.external_input()).name
 
     @external_input.setter
     async def external_input(self, value):
         await self.julabo.external_input(value)
 
-    @attribute(dtype=TemperatureControl)
+    @attribute(dtype=str)
     async def temperature_control(self):
-        return await self.julabo.temperature_control()
+        return (await self.julabo.temperature_control()).name
 
     @temperature_control.setter
     async def temperature_control(self, value):
