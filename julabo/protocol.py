@@ -73,7 +73,8 @@ class AIOProtocol(BaseProtocol):
             async with self._lock:
                 # TODO: maybe consume garbage in the buffer ?
                 reply = await self.conn.write_readline(data)
-                return decode(reply)
+            self._log.debug("read: %r", reply)
+            return decode(reply)
         finally:
             self._last_query = time.monotonic()
 
@@ -106,7 +107,8 @@ class IOProtocol(BaseProtocol):
             with self._lock:
                 # TODO: maybe consume garbage in the buffer ?
                 reply = self.conn.write_readline(data)
-                return decode(reply)
+            self._log.debug("read: %r", reply)
+            return decode(reply)
         finally:
             self._last_query = time.monotonic()
 
