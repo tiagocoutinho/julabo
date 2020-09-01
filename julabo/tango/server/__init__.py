@@ -1,4 +1,4 @@
-from .julabo import JulaboCF, JulaboFC, JulaboHL
+from .device import JulaboCF, JulaboFC, JulaboHL
 
 
 def main():
