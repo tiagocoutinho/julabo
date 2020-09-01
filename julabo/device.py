@@ -119,7 +119,8 @@ class BaseJulabo:
         return self.write("OUT_MODE_05 0")
 
 
-class JulaboCF(BaseJulabo):
+class BaseJulaboCirculator(BaseJulabo):
+    """Base julabo circulators"""
 
     bath_temperature = Float2("IN_PV_00")
     heating_power = Float2("IN_PV_01")
@@ -140,7 +141,17 @@ class JulaboCF(BaseJulabo):
     temperature_control = Enum("IN_MODE_04", "OUT_MODE_04", TemperatureControl)
 
 
+class JulaboCF(BaseJulaboCirculator):
+    """Julabo cryo-compact circulators"""
+
+
+class JulaboHL(BaseJulaboCirculator):
+    """Julabo heating circulators"""
+    pass
+
+
 class JulaboFC(BaseJulabo):
+    """Julabo recirculating coolers"""
 
     working_temperature = Float1("IN_SP_00", "OUT_SP_00")
     high_temperature = Int("IN_SP_01")

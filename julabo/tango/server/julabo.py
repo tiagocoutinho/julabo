@@ -1,7 +1,10 @@
 from tango import DevState
 from tango.server import Device, attribute, command, device_property
 
-from julabo import JulaboCF as _JulaboCF, JulaboFC as _JulaboFC, protocol_for_url
+from julabo import JulaboCF as _JulaboCF
+from julabo import JulaboHL as _JulaboHL
+from julabo import JulaboFC as _JulaboFC
+from julabo import protocol_for_url
 
 
 class BaseJulabo(Device):
@@ -56,9 +59,7 @@ class BaseJulabo(Device):
         self.julabo.stop()
 
 
-class JulaboCF(BaseJulabo):
-
-    Julabo = _JulaboCF
+class BaseJulaboCirculator(BaseJulabo):
 
     @attribute(dtype=float)
     def bath_temperature(self):
@@ -161,7 +162,20 @@ class JulaboCF(BaseJulabo):
         self.julabo.stop()
 
 
+class JulaboCF(BaseJulaboCirculator):
+    """Julabo cryo-compact circulator"""
+
+    Julabo = _JulaboCF
+
+
+class JulaboHL(BaseJulaboCirculator):
+    """Julabo heating circulator"""
+
+    Julabo = _JulaboHL
+
+
 class JulaboFC(BaseJulabo):
+    """Julabo recirculating cooler"""
 
     Julabo = _JulaboFC
 
