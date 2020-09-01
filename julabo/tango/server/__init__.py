@@ -1,4 +1,4 @@
-from .julabo import JulaboCF, JulaboFC
+from .julabo import JulaboCF, JulaboFC, JulaboHL
 
 
 def main():
@@ -8,4 +8,4 @@ def main():
     args = ['Julabo'] + sys.argv[1:]
     fmt = '%(asctime)s %(threadName)s %(levelname)s %(name)s %(message)s'
     logging.basicConfig(level=logging.INFO, format=fmt)
-    run((JulaboCF, JulaboFC), args=args)
+    run((JulaboCF, JulaboHL, JulaboFC), args=args)
