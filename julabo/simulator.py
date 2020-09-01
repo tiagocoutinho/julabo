@@ -36,7 +36,7 @@ class BaseJulabo(BaseDevice):
         super().__init__(name, **kwargs)
 
 
-class JulaboCF(BaseJulabo):
+class BaseJulaboCirculator(BaseJulabo):
 
     DEFAULT = {
         "MODE_01": "0",       # use set point (0..2)
@@ -73,7 +73,7 @@ class JulaboCF(BaseJulabo):
         "PAR_16": "0",        # Lower band limit (0 .. 200)
         "HIL_00": "-5",       # desired maximum cooling power (only CF41)
         "HIL_01": "15",       # max heating power (10 .. 100) %
-        "VERSION": "JULABO HIGHTECH FL HL/SL VERSION 1.0",  # version
+        "VERSION": "JULABO CRYOCOMPACT CF31 VERSION 5.0", # version
         "STATUS": "00 MANUAL START",  # current status
         "PV_00": "29.45",     # actual bath temp
         "PV_01": "3",         # heating power %
@@ -102,3 +102,15 @@ class JulaboCF(BaseJulabo):
         self._log.debug("reply: %r", result)
         return result
 
+
+class JulaboCF(BaseJulaboCirculator):
+
+    DEFAULT = dict(BaseJulaboCirculator.DEFAULT)
+
+
+class JulaboHL(BaseJulaboCirculator):
+
+    DEFAULT = dict(
+        BaseJulaboCirculator.DEFAULT,
+        VERSION="JULABO HIGHTECH FL HL/SL VERSION 1.0"
+    )
