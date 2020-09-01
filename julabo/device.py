@@ -107,7 +107,7 @@ class BaseJulabo:
     def write_readline(self, request):
         return self.protocol.write_readline(request)
 
-    version = member("VERSION")
+    identification = member("VERSION")
     status = member("STATUS")
 
     is_started = member("IN_MODE_05", decode=lambda x: x == "1")
@@ -142,16 +142,16 @@ class BaseJulaboCirculator(BaseJulabo):
 
 
 class JulaboCF(BaseJulaboCirculator):
-    """Julabo cryo-compact circulators"""
+    """Julabo cryo-compact circulator"""
 
 
 class JulaboHL(BaseJulaboCirculator):
-    """Julabo heating circulators"""
+    """Julabo heating circulator"""
     pass
 
 
 class JulaboFC(BaseJulabo):
-    """Julabo recirculating coolers"""
+    """Julabo recirculating cooler"""
 
     working_temperature = Float1("IN_SP_00", "OUT_SP_00")
     high_temperature = Int("IN_SP_01")

@@ -43,8 +43,8 @@ class BaseJulabo(Device):
         return self.julabo.status()
 
     @attribute(dtype=str)
-    def version(self):
-        return self.julabo.version()
+    def identification(self):
+        return self.julabo.identification()
 
     @attribute(dtype=bool)
     def is_started(self):
