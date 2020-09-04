@@ -1,3 +1,5 @@
+import functools
+
 from tango import DevState
 from tango.server import Device, attribute, command, device_property
 
@@ -7,6 +9,15 @@ from julabo import (
     JulaboFC as _JulaboFC,
     connection_for_url
 )
+
+
+def ensure_connection(func):
+    @functools.wraps(func)
+    async def wrapper(self, *args, **kwargs):
+        if not self.connection.is_open:
+            await self.connection.open()
+        return await func(self, *args, **kwargs)
+    return wrapper
 
 
 class BaseJulabo(Device):
@@ -24,12 +35,19 @@ class BaseJulabo(Device):
         if self.url.startswith("serial") or self.url.startswith("rfc2217"):
             kwargs = dict(baudrate=self.baudrate, bytesize=self.bytesize,
                           parity=self.parity)
+        self.connection = connection_for_url(self.url, **kwargs)
+        self.julabo = self.Julabo(self.connection)
 
-        connection = connection_for_url(self.url, **kwargs)
-        self.julabo = self.Julabo(connection)
+    async def delete_device(self):
+        await self.connection.close()
 
     async def dev_state(self):
-        status_code = int((await self.julabo.status())[:2])
+        try:
+            if not self.connection.is_open:
+                await self.connection.open()
+            status_code = int((await self.julabo.status())[:2])
+        except:
+            return DevState.FAULT
         if status_code in {0, 2}:
             return DevState.STANDBY
         elif status_code in {1, 3}:
@@ -39,24 +57,37 @@ class BaseJulabo(Device):
         return DevState.FAULT
 
     async def dev_status(self):
-        return await self.julabo.status()
+        try:
+            if not self.connection.is_open:
+                await self.connection.open()
+            self.__status = await self.julabo.status()
+        except Exception as error:
+            import traceback
+            self.__status = "{!r}\n\nDetails:\n{}".format(
+                error, traceback.format_exc()
+            )
+        return self.__status
 
     @attribute(dtype=str, label="Identification")
+    @ensure_connection
     async def identification(self):
         """Device identification (model and version)"""
         return await self.julabo.identification()
 
     @attribute(dtype=bool, label="Is started?")
+    @ensure_connection
     async def is_started(self):
         """Is device started or not"""
         return await self.julabo.is_started()
 
     @command
+    @ensure_connection
     async def start(self):
         """Start the device"""
         await self.julabo.start()
 
     @command
+    @ensure_connection
     async def stop(self):
         """Stop the device"""
         await self.julabo.stop()
@@ -65,102 +96,124 @@ class BaseJulabo(Device):
 class BaseJulaboCirculator(BaseJulabo):
 
     @attribute(dtype=float, label="Bath temperature", unit="degC")
+    @ensure_connection
     async def bath_temperature(self):
         """Actual bath temperature"""
         return await self.julabo.bath_temperature()
 
     @attribute(dtype=float, label="Heating power", unit="%")
+    @ensure_connection
     async def heating_power(self):
         """Heating power being used"""
         return await self.julabo.heating_power()
 
     @attribute(dtype=float, label="External temperature", unit="degC")
+    @ensure_connection
     async def external_temperature(self):
         """Temperature registered by external PT100 sensor"""
         return await self.julabo.external_temperature()
 
     @attribute(dtype=float, label="Safety temperature", unit="degC")
+    @ensure_connection
     async def safety_temperature(self):
         """Temperature registered by the safety sensor"""
         return await self.julabo.safety_temperature()
 
     @attribute(dtype=float, label="Set point 1", unit="degC")
+    @ensure_connection
     async def set_point_1(self):
         """Working temperature set point channel 1"""
         return await self.julabo.set_point_1()
 
     @set_point_1.setter
+    @ensure_connection
     async def set_point_1(self, value):
         await self.julabo.set_point_1(value)
 
     @attribute(dtype=float, label="Set point 2", unit="degC")
+    @ensure_connection
     async def set_point_2(self):
         """Working temperature set point channel 2"""
         return await self.julabo.set_point_2()
 
     @set_point_2.setter
+    @ensure_connection
     async def set_point_2(self, value):
         await self.julabo.set_point_2(value)
 
     @attribute(dtype=float, label="Set point 3", unit="degC")
+    @ensure_connection
     async def set_point_3(self):
         """Working temperature set point channel 3"""
         return await self.julabo.set_point_3()
 
     @set_point_3.setter
+    @ensure_connection
     async def set_point_3(self, value):
         await self.julabo.set_point_3(value)
 
     @attribute(dtype=float, label="High temperature", unit="degC")
+    @ensure_connection
     async def high_temperature(self):
         """High temperature warning limit"""
         return await self.julabo.high_temperature()
 
     @high_temperature.setter
+    @ensure_connection
     async def high_temperature(self, value):
         await self.julabo.high_temperature(value)
 
     @attribute(dtype=float, label="Low temperature", unit="degC")
+    @ensure_connection
     async def low_temperature(self):
         """Low temperature warning limit"""
         return await self.julabo.low_temperature()
 
     @low_temperature.setter
+    @ensure_connection
     async def low_temperature(self, value):
         await self.julabo.low_temperature(value)
 
     @attribute(dtype=int, label="Active set point channel", min_value=1, max_value=3)
+    @ensure_connection
     async def active_set_point_channel(self):
         return await self.julabo.active_set_point_channel()
 
     @active_set_point_channel.setter
+    @ensure_connection
     async def active_set_point_channel(self, value):
         await self.julabo.active_set_point_channel(value)
 
     @attribute(dtype=str, label="Self tunning")
+    @ensure_connection
     async def self_tunning(self):
         """Self tunning (off|once|always)"""
         return (await self.julabo.self_tunning()).name
 
     @self_tunning.setter
+    @ensure_connection
     async def self_tunning(self, value):
         await self.julabo.self_tunning(value)
 
     @attribute(dtype=str, label="External input")
+    @ensure_connection
     async def external_input(self):
         """External programmer input (voltage|current)"""
         return (await self.julabo.external_input()).name
 
     @external_input.setter
+    @ensure_connection
     async def external_input(self, value):
         await self.julabo.external_input(value)
 
     @attribute(dtype=str, label="Temperature control")
+    @ensure_connection
     async def temperature_control(self):
         """Temperature control (internal|external)"""
         return (await self.julabo.temperature_control()).name
 
     @temperature_control.setter
+    @ensure_connection
     async def temperature_control(self, value):
         await self.julabo.temperature_control(value)
 
@@ -183,49 +236,61 @@ class JulaboFC(BaseJulabo):
     Julabo = _JulaboFC
 
     @attribute(dtype=float)
+    @ensure_connection
     async def working_temperature(self):
         return await self.julabo.working_temperature()
 
     @working_temperature.setter
+    @ensure_connection
     async def working_temperature(self, value):
         await self.julabo.working_temperature(value)
 
     @attribute(dtype=int)
+    @ensure_connection
     async def high_temperature(self):
         return await self.julabo.high_temperature()
 
     @attribute(dtype=int)
+    @ensure_connection
     async def low_temperature(self):
         return await self.julabo.low_temperature()
 
     @attribute(dtype=int)
+    @ensure_connection
     async def control_ratio(self):
         return await self.julabo.control_ratio()
 
     @control_ratio.setter
+    @ensure_connection
     async def control_ratio(self, value):
         await self.julabo.control_ratio(value)
 
     @attribute(dtype=float)
+    @ensure_connection
     async def feed_temperature(self):
         return await self.julabo.feed_temperature()
 
     @feed_temperature.setter
+    @ensure_connection
     async def feed_temperature(self, value):
         await self.julabo.feed_temperature(value)
 
     @attribute(dtype=float)
+    @ensure_connection
     async def external_temperature(self):
         return await self.julabo.external_temperature()
 
     @attribute(dtype=float)
+    @ensure_connection
     async def heater_capacity(self):
         return await self.julabo.heater_capacity()
 
     @attribute(dtype=float)
+    @ensure_connection
     async def return_temperature(self):
         return await self.julabo.return_temperature()
 
     @attribute(dtype=float)
+    @ensure_connection
     async def safety_temperature(self):
         return await self.julabo.safety_temperature()

@@ -37,6 +37,7 @@ from julabo import JulaboCF, connection_for_url
 async def main():
     conn = connection_for_url("tcp://controls.lab.org:17890")
     dev = JulaboCF(conn)
+    await conn.open()
 
     ident = await dev.identification()
     status = await dev.status()
@@ -122,6 +123,7 @@ $ python
 >>> from julabo import JulaboCF, connection_for_url
 >>> conn = connection_for_url("serial:///tmp/julabo-cf31", concurrency="syncio")
 >>> dev = JulaboCF(conn)
+>>> conn.open()
 >>> print(dev.identification())
 JULABO CRYOCOMPACT CF31 VERSION 5.0
 ```
