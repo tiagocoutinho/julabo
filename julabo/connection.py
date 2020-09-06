@@ -46,11 +46,12 @@ def connection_for_url(url, *args, **kwargs):
     scheme = url_result.scheme
     if scheme == "serial":
         # local serial line
+        port = url_result.path
         if concurrency is "syncio":
-            return Serial(url[9:], *args, **kwargs)
+            return Serial(port, *args, **kwargs)
         elif concurrency is "asyncio":
             import serialio.aio.posix
-            return serialio.aio.posix.Serial(url, *args, **kwargs)
+            return serialio.aio.posix.Serial(port, *args, **kwargs)
     elif scheme == "rfc2217":
         if concurrency is "syncio":
             return Serial(url, *args, **kwargs)
