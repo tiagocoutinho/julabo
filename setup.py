@@ -5,7 +5,7 @@
 import sys
 from setuptools import setup, find_packages
 
-requirements = ["pyserial", "sockio>=0.10", "serialio>=1.2"]
+requirements = ["pyserial", "sockio>=0.10", "serialio>=2"]
 
 with open("README.md") as f:
     description = f.read()

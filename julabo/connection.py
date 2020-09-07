@@ -59,18 +59,16 @@ def connection_for_url(url, *args, **kwargs):
             import serialio.aio.rfc2217
             return serialio.aio.rfc2217.Serial(url, *args, **kwargs)
     elif scheme == "serial-tcp":
-        host, port = url_result.netloc.split(":", 1)
-        port = int(port)
         if concurrency is "syncio":
             import sockio.sio
+            host, port = url_result.hostname, url_result.port
             kwargs.setdefault("auto_reconnect", False)
             return sockio.sio.TCP(host, port, *args, **kwargs)
         elif concurrency is "asyncio":
             import serialio.aio.tcp
             return serialio.aio.tcp.Serial(url, *args, **kwargs)
     elif scheme == "tcp":
-        host, port = url_result.netloc.split(":", 1)
-        port = int(port)
+        host, port = url_result.hostname, url_result.port
         if concurrency is "syncio":
             import sockio.sio
             kwargs.setdefault("auto_reconnect", False)
