@@ -20,12 +20,16 @@ setup(
     entry_points={
         "console_scripts": [
             "Julabo = julabo.tango.server:main [tango]",
+        ],
+        'sinstruments.device': [
+            'JulaboCF = julabo.simulator:JulaboCF [simulator]',
+            'JulaboHL = julabo.simulator:JulaboHL [simulator]'
         ]
     },
     install_requires=requirements,
     extras_require={
         "tango": ["pytango"],
-        "simulator": ["sinstruments>=1"]
+        "simulator": ["sinstruments>=1.3"]
     },
     classifiers=[
         "Natural Language :: English",
