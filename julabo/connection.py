@@ -47,33 +47,33 @@ def connection_for_url(url, *args, **kwargs):
     if scheme == "serial":
         # local serial line
         port = url_result.path
-        if concurrency is "syncio":
+        if concurrency == "syncio":
             return Serial(port, *args, **kwargs)
-        elif concurrency is "asyncio":
+        elif concurrency == "asyncio":
             import serialio.aio.posix
             return serialio.aio.posix.Serial(port, *args, **kwargs)
     elif scheme == "rfc2217":
-        if concurrency is "syncio":
+        if concurrency == "syncio":
             return Serial(url, *args, **kwargs)
-        elif concurrency is "asyncio":
+        elif concurrency == "asyncio":
             import serialio.aio.rfc2217
             return serialio.aio.rfc2217.Serial(url, *args, **kwargs)
     elif scheme == "serial-tcp":
-        if concurrency is "syncio":
+        if concurrency == "syncio":
             import sockio.sio
             host, port = url_result.hostname, url_result.port
             kwargs.setdefault("auto_reconnect", False)
             return sockio.sio.TCP(host, port, *args, **kwargs)
-        elif concurrency is "asyncio":
+        elif concurrency == "asyncio":
             import serialio.aio.tcp
             return serialio.aio.tcp.Serial(url, *args, **kwargs)
     elif scheme == "tcp":
         host, port = url_result.hostname, url_result.port
-        if concurrency is "syncio":
+        if concurrency == "syncio":
             import sockio.sio
             kwargs.setdefault("auto_reconnect", False)
             return sockio.sio.TCP(host, port, *args, **kwargs)
-        elif concurrency is "asyncio":
+        elif concurrency == "asyncio":
             import sockio.aio
             kwargs.setdefault("auto_reconnect", False)
             return sockio.aio.TCP(host, port, *args, **kwargs)

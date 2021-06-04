@@ -16,8 +16,6 @@
         url: /tmp/julabo-cf31-1
 """
 
-import time
-
 from sinstruments.simulator import BaseDevice
 
 

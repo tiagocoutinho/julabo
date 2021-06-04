@@ -2,7 +2,6 @@
 
 """The setup script."""
 
-import sys
 from setuptools import setup, find_packages
 
 requirements = ["pyserial", "sockio>=0.10", "serialio>=2"]
