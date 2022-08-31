@@ -8,7 +8,7 @@ from .protocol import Protocol
 
 
 __all__ = [
-    "JulaboCF", "JulaboHL", "JulaboFC",
+    "JulaboCF", "JulaboHL", "JulaboFC", "JulaboMS",
     "SelfTunning", "ExternalInput", "TemperatureControl", "ControlMode"
 ]
 
@@ -151,6 +151,11 @@ class JulaboCF(BaseJulaboCirculator):
 
 class JulaboHL(BaseJulaboCirculator):
     """Julabo heating circulator"""
+    pass
+
+
+class JulaboMS(BaseJulaboCirculator):
+    """Julabo refrigerated/heating circulator"""
     pass
 
 
