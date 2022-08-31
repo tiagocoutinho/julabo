@@ -114,3 +114,11 @@ class JulaboHL(BaseJulaboCirculator):
         BaseJulaboCirculator.DEFAULT,
         VERSION="JULABO HIGHTECH FL HL/SL VERSION 1.0"
     )
+
+
+class JulaboMS(BaseJulaboCirculator):
+
+    DEFAULT = dict(
+        BaseJulaboCirculator.DEFAULT,
+        VERSION="JULABO MAGIO MS 200-230V 50/60Hz VERSION 2.2.1"
+    )
