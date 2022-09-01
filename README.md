@@ -1,6 +1,6 @@
 # Julabo library
 
-![Julabo CF31](docs/cf31.png)
+<img align="right" alt="Julabo CF31" width="350" src="docs/cf31.png" />
 
 This library is used to control basic features of Julabo equipment. It is
 composed of a core library, an optional simulator and an optional
