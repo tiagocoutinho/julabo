@@ -22,7 +22,7 @@ setup(
     name="julabo",
     author="Tiago Coutinho",
     author_email="tcoutinho@cells.es",
-    version="2.2.1",
+    version="2.3.0",
     description="julabo library",
     long_description=description,
     long_description_content_type="text/markdown",
