@@ -1,12 +1,12 @@
 # Julabo library
 
-![Julabo CF31](docs/cf31.png)
+<img align="right" alt="Julabo CF31" width="280" src="docs/cf31.png" />
 
 This library is used to control basic features of Julabo equipment. It is
 composed of a core library, an optional simulator and an optional
 [tango](https://tango-controls.org/) device server.
 
-It has been tested with CF31, HL-4 and FC models, but should work with
+It has been tested with CF31, HL-4, MS-1000f and FC models, but should work with
 other models too.
 
 It can be used with either with a direct serial line (read below
@@ -24,8 +24,8 @@ From within your favorite python environment type:
 
 ## Library
 
-The core of the julabo library consists of JulaboCF, JulaboHL and JulaboFC
-objects.
+The core of the julabo library consists of JulaboCF, JulaboHL, JulaboMS and
+ JulaboFC objects.
 To create a Julabo object you need to pass a communication object.
 Here is how to connect to a julabo CF31 through a raw tcp socket:
 
