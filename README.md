@@ -94,6 +94,7 @@ using default values:
 
 devices:
 - class: JulaboCF
+  name: julabo EH1
   package: julabo.simulator
   transports:
   - type: serial
